@@ -1,0 +1,42 @@
+asciidoctor {
+    sources {
+        include '*.adoc'
+    }
+    sourceDir = file("${rootProject.projectDir}/docs")
+    resources {
+        from(file("${rootProject.projectDir}/ax-docs-shared")) {
+            include 'stylesheets/*'
+        }
+    }
+    logDocuments = true
+    backends = ["html5"]
+
+    options doctype: 'book', eruby: 'erubis'
+    attributes  'icons': 'font',
+            'idprefix': '',
+            'idseparator': '-',
+            docinfo: '',
+            linkcss: '',
+            doctype: 'book',
+            revnumber: project.version,
+            sectanchors: '',
+            sectnums: '',
+            'source-highlighter': 'coderay@', // TODO switch to 'rouge' once supported by the html5 backend
+            stylesdir: 'stylesheets/',
+            stylesheet: 'across.css',
+            'spring-version': project.version
+
+}
+
+task docsZip(type: Zip, dependsOn: ['asciidoctor']) {
+    group = "Distribution"
+    baseName = "across-docs-distribution"
+    version = ""
+    classifier = "docs"
+    description = "Builds -${classifier} archive containing reference " +
+            "for deployment at http://docs-across.foreach.be"
+
+    from ("${buildDir}/asciidoc/html5") {
+        into "${project.version}/reference"
+    }
+}
